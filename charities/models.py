@@ -20,6 +20,18 @@ class Benefactor(models.Model):
     free_time_per_week = PositiveSmallIntegerField(default=0)
 
 
+class TaskManager(models.Manager):
+    def related_tasks_to_charity(self, user):
+        return self.filter(charity__user=user)
+
+    def related_tasks_to_benefactor(self, user):
+        return self.filter(assigned_benefactor__user=user)
+
+    def all_related_tasks_to_user(self, user):
+        return self.filter(
+            models.Q(charity__user=user) | models.Q(assigned_benefactor__user=user) | models.Q(state='P'))
+
+
 class Task(models.Model):
     GENDER_CHOICES = [
         ('F', 'Female'),
@@ -42,3 +54,5 @@ class Task(models.Model):
     gender_limit = models.CharField(choices=GENDER_CHOICES, blank=True, null=True, max_length=1)
     state = models.CharField(choices=STATE_CHOICES, default='P', max_length=1)
     title = models.CharField(max_length=60)
+
+    objects = TaskManager()
