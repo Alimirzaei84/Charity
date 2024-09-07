@@ -1,3 +1,4 @@
+from django.contrib.auth.models import Permission
 from rest_framework import status, generics
 from rest_framework.generics import get_object_or_404, CreateAPIView
 from rest_framework.permissions import IsAuthenticated, SAFE_METHODS
@@ -65,9 +66,14 @@ class Tasks(generics.ListCreateAPIView):
 
         return queryset.filter(**filter_lookups).exclude(**exclude_lookups)
 
-
 class TaskRequest(APIView):
-
+    permission_classes = [IsBenefactor]
+    def get(self, request, task_id):
+        task = get_object_or_404(Task, id=task_id)
+        if task.state != Task.TaskStatus.PENDING:
+            return Response(data={'detail': 'This task is not pending.'}, status=status.HTTP_404_NOT_FOUND)
+        task.assign_to_benefactor(request.user.benefactor)
+        return Response(data={'detail': 'Request sent.'}, status=status.HTTP_200_OK)
 
 
 class TaskResponse(APIView):
