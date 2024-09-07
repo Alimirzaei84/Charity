@@ -21,5 +21,4 @@ class LogoutAPIView(APIView):
 
 
 class UserRegistration(CreateAPIView):
-    queryset = User.objects.all()
     serializer_class = UserSerializer
