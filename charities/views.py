@@ -67,7 +67,7 @@ class Tasks(generics.ListCreateAPIView):
 
 
 class TaskRequest(APIView):
-    pass
+
 
 
 class TaskResponse(APIView):
