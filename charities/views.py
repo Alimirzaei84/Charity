@@ -1,5 +1,5 @@
 from rest_framework import status, generics
-from rest_framework.generics import get_object_or_404
+from rest_framework.generics import get_object_or_404, CreateAPIView
 from rest_framework.permissions import IsAuthenticated, SAFE_METHODS
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -11,12 +11,20 @@ from charities.serializers import (
 )
 
 
-class BenefactorRegistration(APIView):
-    pass
+class BenefactorRegistration(CreateAPIView):
+    serializer_class = BenefactorSerializer
+    permission_classes = [IsAuthenticated]
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
 
 
-class CharityRegistration(APIView):
-    pass
+class CharityRegistration(CreateAPIView):
+    serializer_class = CharitySerializer
+    permission_classes = [IsAuthenticated]
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
 
 
 class Tasks(generics.ListCreateAPIView):
@@ -30,10 +38,10 @@ class Tasks(generics.ListCreateAPIView):
             **request.data,
             "charity_id": request.user.charity.id
         }
-        serializer = self.serializer_class(data = data)
-        serializer.is_valid(raise_exception = True)
+        serializer = self.serializer_class(data=data)
+        serializer.is_valid(raise_exception=True)
         serializer.save()
-        return Response(serializer.data, status = status.HTTP_201_CREATED)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def get_permissions(self):
         if self.request.method in SAFE_METHODS:

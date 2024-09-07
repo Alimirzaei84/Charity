@@ -70,3 +70,5 @@ celerybeat-schedule.*
 
 # Environments
 .env
+
+Charity.zip
